@@ -1,7 +1,5 @@
 import * as XLSX from 'xlsx';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 
 export const exportTransactionsToExcel = async (transactions) => {
   try {
@@ -24,27 +22,11 @@ export const exportTransactionsToExcel = async (transactions) => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Laporan Transaksi");
 
-    // Generate base64
-    const wbout = XLSX.write(wb, { type: 'base64', bookType: "xlsx" });
-    
-    // File name
-    const fileName = `Laporan_Catatabung_${new Date().getTime()}.xlsx`;
-    const filePath = FileSystem.cacheDirectory + fileName;
-
-    // Write file
-    await FileSystem.writeAsStringAsync(filePath, wbout, {
-      encoding: FileSystem.EncodingType.Base64
-    });
-
-    // Share file
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(filePath, {
-        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        dialogTitle: 'Kirim Laporan Excel',
-        UTI: 'com.microsoft.excel.xlsx'
-      });
+    if (Platform.OS === 'web') {
+      // Direct download for Web
+      XLSX.writeFile(wb, `Laporan_Catatabung_${new Date().getTime()}.xlsx`);
     } else {
-      Alert.alert('Error', 'Fitur sharing tidak tersedia di perangkat ini');
+      Alert.alert('Error', 'Modul export native telah dihapus. Silakan gunakan versi web.');
     }
   } catch (error) {
     console.error('Export error:', error);

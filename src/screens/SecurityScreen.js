@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { Lock, Fingerprint, ShieldCheck, ShieldAlert } from 'lucide-react-native';
-import * as LocalAuthentication from 'expo-local-authentication';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,29 +10,8 @@ const SecurityScreen = () => {
   const { theme } = useTheme();
 
   const handleBiometric = async () => {
-    try {
-      const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
-      if (!hasHardware || !isEnrolled) {
-        unlockApp(); // Fallback if no biometric set up but security enabled
-        return;
-      }
-
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Keamanan Biometrik',
-        fallbackLabel: 'Gunakan PIN Perangkat',
-        cancelLabel: 'Batal',
-        disableDeviceFallback: false,
-      });
-
-      if (result.success) {
-        unlockApp();
-      }
-    } catch (e) {
-      console.error(e);
-      Alert.alert('Keamanan', 'Gagal memverifikasi identitas Anda.');
-    }
+    // Pada versi Web/Vercel, fitur biometric dihilangkan untuk kompatibilitas murni web
+    unlockApp();
   };
 
   useEffect(() => {
