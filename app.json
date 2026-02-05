@@ -36,17 +36,14 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png",
       "bundler": "metro",
-      "output": "static",
+      "output": "single",
+      "favicon": "./assets/favicon.png",
       "name": "CATATABUNG Pro",
       "shortName": "CATATABUNG",
-      "description": "Aplikasi pencatat keuangan pribadi dan target tabungan.",
-      "lang": "id",
       "display": "standalone",
       "themeColor": "#000000",
-      "backgroundColor": "#000000",
-      "preferRelatedApplications": false
+      "backgroundColor": "#000000"
     },
     "plugins": [
       [
