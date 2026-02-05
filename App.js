@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { LayoutDashboard, Receipt, Target, Calendar, User, CircleHelp } from 'lucide-react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -13,12 +14,26 @@ import CalendarScreen from './src/screens/CalendarScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import SecurityScreen from './src/screens/SecurityScreen';
+import CategorySettingsScreen from './src/screens/CategorySettingsScreen';
+import VersionHistoryScreen from './src/screens/VersionHistoryScreen';
 
 // Import Context
 import { AppProvider, useAppContext } from './src/context/AppContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+const ProfileStack = () => {
+  const { theme } = useTheme();
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.background } }}>
+      <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+      <Stack.Screen name="CategorySettings" component={CategorySettingsScreen} />
+      <Stack.Screen name="VersionHistory" component={VersionHistoryScreen} />
+    </Stack.Navigator>
+  );
+};
 
 const RootNavigator = () => {
   const { isOnboarded, loading, isLocked } = useAppContext();
@@ -102,7 +117,7 @@ const RootNavigator = () => {
         />
         <Tab.Screen 
           name="Profil" 
-          component={ProfileScreen} 
+          component={ProfileStack} 
           options={{
             tabBarIcon: ({ color, size }) => {
               const Icon = User || CircleHelp;

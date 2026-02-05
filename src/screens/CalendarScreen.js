@@ -68,102 +68,104 @@ const CalendarScreen = () => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-      <View style={styles.header}>
-        <View>
-          <Text style={[styles.headerTitle, { color: theme.text }]}>Jejak Keuangan</Text>
-          <Text style={[styles.headerSub, { color: theme.textSecondary }]}>Riwayat transaksi harian Anda</Text>
-        </View>
-        <View style={[styles.dateIcon, { backgroundColor: theme.card }]}>
-           <CalendarIcon size={22} color={theme.primary} />
-        </View>
-      </View>
-      
-      <View style={[styles.calendarCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        <Calendar
-          theme={{
-            calendarBackground: 'transparent',
-            textSectionTitleColor: theme.textSecondary,
-            selectedDayBackgroundColor: theme.primary,
-            selectedDayTextColor: '#ffffff',
-            todayTextColor: theme.primary,
-            dayTextColor: theme.text,
-            textDisabledColor: theme.border,
-            dotColor: theme.primary,
-            monthTextColor: theme.text,
-            indicatorColor: theme.primary,
-            arrowColor: theme.primary,
-            textDayFontWeight: '600',
-            textMonthFontWeight: '900',
-            textDayHeaderFontWeight: '700',
-            textDayFontSize: 14,
-            textMonthFontSize: 16,
-            'stylesheet.calendar.header': {
-                header: {
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    paddingLeft: 10,
-                    paddingRight: 10,
-                    marginTop: 5,
-                    alignItems: 'center',
-                    marginBottom: 10
-                },
-                monthText: {
-                    fontSize: 18,
-                    fontWeight: '800',
-                    color: theme.text,
-                    letterSpacing: -0.5
-                }
-            }
-          }}
-          markedDates={markedDates}
-          onDayPress={day => setSelectedDate(day.dateString)}
-          enableSwipeMonths={true}
-          renderArrow={(dir) => dir === 'left' ? <ChevronLeft size={20} color={theme.primary} /> : <ChevronRight size={20} color={theme.primary} />}
-        />
-      </View>
-
-      <View style={styles.summaryContainer}>
-        <View style={[styles.summaryBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <View style={styles.summaryHeader}>
-                <Info size={14} color={theme.textSecondary} />
-                <Text style={[styles.summaryTitle, { color: theme.textSecondary }]}>RINGKASAN HARI INI</Text>
-            </View>
-            <View style={styles.summaryRow}>
-                <View style={styles.sumItem}>
-                    <View style={[styles.iconCircle, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
-                        <TrendingUp size={14} color={theme.positive} />
-                    </View>
-                    <View>
-                        <Text style={[styles.sumLabel, { color: theme.textSecondary }]}>Pemasukan</Text>
-                        <Text style={[styles.sumValue, { color: theme.positive }]}>+Rp {dailySummary.income.toLocaleString('id-ID')}</Text>
-                    </View>
-                </View>
-                <View style={[styles.vDivider, { backgroundColor: theme.border }]} />
-                <View style={styles.sumItem}>
-                    <View style={[styles.iconCircle, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
-                        <TrendingDown size={14} color={theme.negative} />
-                    </View>
-                    <View>
-                        <Text style={[styles.sumLabel, { color: theme.textSecondary }]}>Pengeluaran</Text>
-                        <Text style={[styles.sumValue, { color: theme.negative }]}>-Rp {dailySummary.expense.toLocaleString('id-ID')}</Text>
-                    </View>
-                </View>
-            </View>
-        </View>
-      </View>
-
       <FlatList
         data={filteredTransactions}
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => <TransactionCard item={item} />}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
+          <>
+            <View style={styles.header}>
+              <View>
+                <Text style={[styles.headerTitle, { color: theme.text }]}>Jejak Keuangan</Text>
+                <Text style={[styles.headerSub, { color: theme.textSecondary }]}>Riwayat transaksi harian Anda</Text>
+              </View>
+              <View style={[styles.dateIcon, { backgroundColor: theme.card }]}>
+                <CalendarIcon size={22} color={theme.primary} />
+              </View>
+            </View>
+            
+            <View style={[styles.calendarCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+              <Calendar
+                theme={{
+                  calendarBackground: 'transparent',
+                  textSectionTitleColor: theme.textSecondary,
+                  selectedDayBackgroundColor: theme.primary,
+                  selectedDayTextColor: '#ffffff',
+                  todayTextColor: theme.primary,
+                  dayTextColor: theme.text,
+                  textDisabledColor: theme.border,
+                  dotColor: theme.primary,
+                  monthTextColor: theme.text,
+                  indicatorColor: theme.primary,
+                  arrowColor: theme.primary,
+                  textDayFontWeight: '600',
+                  textMonthFontWeight: '900',
+                  textDayHeaderFontWeight: '700',
+                  textDayFontSize: 14,
+                  textMonthFontSize: 16,
+                  'stylesheet.calendar.header': {
+                      header: {
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          paddingLeft: 10,
+                          paddingRight: 10,
+                          marginTop: 5,
+                          alignItems: 'center',
+                          marginBottom: 10
+                      },
+                      monthText: {
+                          fontSize: 18,
+                          fontWeight: '800',
+                          color: theme.text,
+                          letterSpacing: -0.5
+                      }
+                  }
+                }}
+                markedDates={markedDates}
+                onDayPress={day => setSelectedDate(day.dateString)}
+                enableSwipeMonths={true}
+                renderArrow={(dir) => dir === 'left' ? <ChevronLeft size={20} color={theme.primary} /> : <ChevronRight size={20} color={theme.primary} />}
+              />
+            </View>
+
+            <View style={styles.summaryContainer}>
+              <View style={[styles.summaryBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                  <View style={styles.summaryHeader}>
+                      <Info size={14} color={theme.textSecondary} />
+                      <Text style={[styles.summaryTitle, { color: theme.textSecondary }]}>RINGKASAN HARI INI</Text>
+                  </View>
+                  <View style={styles.summaryRow}>
+                      <View style={styles.sumItem}>
+                          <View style={[styles.iconCircle, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+                              <TrendingUp size={14} color={theme.positive} />
+                          </View>
+                          <View>
+                              <Text style={[styles.sumLabel, { color: theme.textSecondary }]}>Pemasukan</Text>
+                              <Text style={[styles.sumValue, { color: theme.positive }]}>+Rp {dailySummary.income.toLocaleString('id-ID')}</Text>
+                          </View>
+                      </View>
+                      <View style={[styles.vDivider, { backgroundColor: theme.border }]} />
+                      <View style={styles.sumItem}>
+                          <View style={[styles.iconCircle, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
+                              <TrendingDown size={14} color={theme.negative} />
+                          </View>
+                          <View>
+                              <Text style={[styles.sumLabel, { color: theme.textSecondary }]}>Pengeluaran</Text>
+                              <Text style={[styles.sumValue, { color: theme.negative }]}>-Rp {dailySummary.expense.toLocaleString('id-ID')}</Text>
+                          </View>
+                      </View>
+                  </View>
+              </View>
+            </View>
+
             <View style={styles.listHeaderRow}>
                 <Text style={[styles.listHeader, { color: theme.text }]}>{formatDateLabel(selectedDate)}</Text>
                 <View style={[styles.countBadge, { backgroundColor: theme.primary }]}>
                     <Text style={styles.countText}>{filteredTransactions.length}</Text>
                 </View>
             </View>
+          </>
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>

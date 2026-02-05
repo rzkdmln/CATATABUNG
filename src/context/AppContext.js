@@ -8,6 +8,8 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [transactions, setTransactions] = useState([]);
   const [goals, setGoals] = useState([]);
+  const [expenseCategories, setExpenseCategories] = useState(['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Hiburan', 'Kesehatan', 'Pendidikan', 'Donasi', 'Lainnya']);
+  const [incomeCategories, setIncomeCategories] = useState(['Gaji', 'Bonus', 'Investasi', 'Hadiah', 'Penjualan', 'Lainnya']);
   const [user, setUser] = useState({ name: '', profileImage: null });
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
@@ -71,9 +73,13 @@ export const AppProvider = ({ children }) => {
       
       const savedUser = await getData('user_profile');
       const savedOnboarding = await getData('onboarding_status');
+      const savedExpenseCats = await getData('expense_categories');
+      const savedIncomeCats = await getData('income_categories');
       
       if (remoteTransactions) setTransactions(remoteTransactions);
       if (remoteGoals) setGoals(remoteGoals);
+      if (savedExpenseCats) setExpenseCategories(savedExpenseCats);
+      if (savedIncomeCats) setIncomeCategories(savedIncomeCats);
       
       // If we have a session user, prioritize it over local storage
       if (session?.user) {
@@ -96,6 +102,30 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const addCategory = async (type, category) => {
+    if (type === 'expense') {
+      const newCats = [...expenseCategories, category];
+      setExpenseCategories(newCats);
+      await saveData('expense_categories', newCats);
+    } else {
+      const newCats = [...incomeCategories, category];
+      setIncomeCategories(newCats);
+      await saveData('income_categories', newCats);
+    }
+  };
+
+  const removeCategory = async (type, category) => {
+    if (type === 'expense') {
+      const newCats = expenseCategories.filter(c => c !== category);
+      setExpenseCategories(newCats);
+      await saveData('expense_categories', newCats);
+    } else {
+      const newCats = incomeCategories.filter(c => c !== category);
+      setIncomeCategories(newCats);
+      await saveData('income_categories', newCats);
+    }
+  };
+
   const signInWithGoogle = async () => {
     try {
       setLoading(true);
@@ -113,10 +143,18 @@ export const AppProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    setUser({ name: '', profileImage: null });
-    setIsOnboarded(false);
-    await saveData('onboarding_status', false);
+    try {
+      await supabase.auth.signOut();
+      setSession(null);
+      setTransactions([]);
+      setGoals([]);
+      setUser({ name: '', profileImage: null });
+      setIsOnboarded(false);
+      await saveData('onboarding_status', false);
+      await saveData('user_profile', null);
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   };
 
   const completeOnboarding = async (name) => {
@@ -130,9 +168,22 @@ export const AppProvider = ({ children }) => {
   };
 
   const updateUser = async (updatedData) => {
-    const newUser = { ...user, ...updatedData };
-    setUser(newUser);
-    await saveData('user_profile', newUser);
+    try {
+      const newUser = { ...user, ...updatedData };
+      setUser(newUser);
+      await saveData('user_profile', newUser);
+
+      if (session?.user) {
+        await supabase.auth.updateUser({
+          data: { 
+            full_name: newUser.name,
+            avatar_url: newUser.profileImage
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Update user failed:", err);
+    }
   };
 
   const addTransaction = async (tx) => {
@@ -198,6 +249,8 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider value={{
       transactions,
       goals,
+      expenseCategories,
+      incomeCategories,
       user,
       isOnboarded,
       isLocked,
@@ -208,6 +261,8 @@ export const AppProvider = ({ children }) => {
       addGoal,
       deleteGoal,
       updateGoalProgress,
+      addCategory,
+      removeCategory,
       getBalance,
       completeOnboarding,
       updateUser,

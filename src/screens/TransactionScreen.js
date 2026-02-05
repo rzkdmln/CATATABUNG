@@ -6,22 +6,22 @@ import { useTheme } from '../context/ThemeContext';
 import { Save, MinusCircle, PlusCircle, Tag, CreditCard, Layout } from 'lucide-react-native';
 import { formatNumber, cleanNumber } from '../utils/format';
 
-const CATEGORIES = {
-  expense: ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Hiburan', 'Kesehatan', 'Pendidikan', 'Donasi', 'Lainnya'],
-  income: ['Gaji', 'Bonus', 'Investasi', 'Hadiah', 'Penjualan', 'Lainnya']
-};
-
 const TransactionScreen = () => {
-  const { addTransaction } = useAppContext();
+  const { addTransaction, expenseCategories, incomeCategories } = useAppContext();
   const { theme } = useTheme();
   const [title, setTitle] = useState('');
   const [displayAmount, setDisplayAmount] = useState('');
   const [type, setType] = useState('expense');
-  const [category, setCategory] = useState(CATEGORIES.expense[0]);
+  const [category, setCategory] = useState(expenseCategories[0]);
+
+  const CATEGORIES = {
+    expense: expenseCategories,
+    income: incomeCategories
+  };
 
   const handleTypeChange = (newType) => {
     setType(newType);
-    setCategory(CATEGORIES[newType][0]);
+    setCategory(newType === 'expense' ? expenseCategories[0] : incomeCategories[0]);
   };
 
   const handleAmountChange = (text) => {

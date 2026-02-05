@@ -49,7 +49,7 @@ const SavingGoalsScreen = () => {
       title,
       targetAmount: parseFloat(target),
       deadline: deadline.toISOString(),
-      reminderTime: reminderTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      reminderTime: reminderTime.getHours().toString().padStart(2, '0') + ':' + reminderTime.getMinutes().toString().padStart(2, '0') + ':00'
     };
     addGoal(newGoal);
     setTitle('');
