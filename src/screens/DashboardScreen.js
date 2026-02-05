@@ -49,7 +49,12 @@ const DashboardScreen = ({ navigation }) => {
     });
 
     return {
-      labels: sorted.slice(-5).map(t => t.date.split('/')[0]),
+      labels: sorted.slice(-5).map(t => {
+        if (!t.date) return '-';
+        // Extract day from ISO string (YYYY-MM-DD)
+        const day = t.date.split('T')[0].split('-')[2];
+        return day;
+      }),
       datasets: [{ data: history.slice(-5) }]
     };
   }, [transactions]);

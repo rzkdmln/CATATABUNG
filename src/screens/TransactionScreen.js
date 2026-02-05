@@ -40,7 +40,7 @@ const TransactionScreen = () => {
       amount: numAmount,
       type,
       category,
-      date: new Date().toLocaleDateString('id-ID'),
+      date: new Date().toISOString(),
     };
 
     addTransaction(newTransaction);

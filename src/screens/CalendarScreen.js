@@ -24,9 +24,8 @@ const CalendarScreen = () => {
   const markedDates = useMemo(() => {
     const marks = {};
     transactions.forEach(tx => {
-      const parts = tx.date.split('/');
-      if (parts.length === 3) {
-        const isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      if (tx.date) {
+        const isoDate = tx.date.split('T')[0];
         marks[isoDate] = { 
           marked: true, 
           dotColor: tx.type === 'income' ? theme.positive : theme.negative 
@@ -44,9 +43,8 @@ const CalendarScreen = () => {
   }, [transactions, selectedDate, theme]);
 
   const filteredTransactions = transactions.filter(tx => {
-    const parts = tx.date.split('/');
-    if (parts.length === 3) {
-       const isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    if (tx.date) {
+       const isoDate = tx.date.split('T')[0];
        return isoDate === selectedDate;
     }
     return false;

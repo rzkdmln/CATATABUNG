@@ -16,7 +16,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.catatabung.app",
       "infoPlist": {
-        "NSFaceIDUsageDescription": "Aplikasi memerlukan akses FaceID untuk keamanan finansial Anda."
+        "NSFaceIDUsageDescription": "Aplikasi memerlukan akses FaceID untuk keamanan finansial Anda.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -35,7 +36,13 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "name": "CATATABUNG Pro",
+      "shortName": "CATATABUNG",
+      "display": "standalone",
+      "themeColor": "#000000",
+      "backgroundColor": "#000000"
     },
     "plugins": [
       [
