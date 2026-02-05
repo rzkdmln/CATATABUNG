@@ -5,33 +5,37 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     react({
-      // Pastikan Babel memproses JSX di file .js
-      babel: {
-        plugins: [
-          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
-        ],
-      },
+      // Memaksa plugin react untuk memproses file .js sebagai JSX
+      jsxRuntime: 'automatic',
+      include: /\.(js|jsx|ts|tsx)$/,
     })
   ],
   resolve: {
     alias: {
       'react-native': 'react-native-web',
     },
+    extensions: ['.web.js', '.js', '.jsx', '.ts', '.tsx']
   },
   esbuild: {
-    // Agar Vite dev server mengenali JSX di .js
+    // Memaksa esbuild (untuk dev) menggunakan loader JSX untuk file .js
     loader: 'jsx',
     include: /src\/.*\.js$|App\.js$|index\.js$/,
-    exclude: [],
   },
   optimizeDeps: {
     esbuildOptions: {
       loader: {
         '.js': 'jsx',
       },
+      resolveExtensions: ['.web.js', '.js', '.jsx', '.ts', '.tsx']
     },
   },
   define: {
     global: 'window',
+    __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
   },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  }
 });
