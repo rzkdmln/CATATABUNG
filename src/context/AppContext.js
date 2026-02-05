@@ -16,15 +16,25 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     const handleInitialAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        // Sign in anonymously if no session exists to satisfy RLS
-        const { data, error } = await supabase.auth.signInAnonymously();
-        if (error) console.error("Anonymous Sign-in Error:", error);
-        else setSession(data.session);
-      } else {
-        setSession(session);
+      try {
+        const { data: { session: existingSession } } = await supabase.auth.getSession();
+        
+        if (!existingSession) {
+          // Sign in anonymously if no session exists to satisfy RLS
+          const { data, error } = await supabase.auth.signInAnonymously();
+          if (error) {
+            console.error("Anonymous Sign-in Error:", error);
+            // Even if auth fails, we should stop the loading state to avoid a blank screen
+            setLoading(false);
+          } else {
+            setSession(data.session);
+          }
+        } else {
+          setSession(existingSession);
+        }
+      } catch (err) {
+        console.error("Auth initialization error:", err);
+        setLoading(false);
       }
     };
 
