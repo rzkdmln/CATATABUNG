@@ -7,7 +7,7 @@ import { Save, MinusCircle, PlusCircle, Tag, CreditCard, Layout } from 'lucide-r
 import { formatNumber, cleanNumber } from '../utils/format';
 
 const CATEGORIES = {
-  expense: ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Hiburan', 'Kesehatan', 'Lainnya'],
+  expense: ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Hiburan', 'Kesehatan', 'Pendidikan', 'Donasi', 'Lainnya'],
   income: ['Gaji', 'Bonus', 'Investasi', 'Hadiah', 'Penjualan', 'Lainnya']
 };
 
@@ -63,44 +63,46 @@ const TransactionScreen = () => {
     }
   };
 
-  const activeColor = type === 'income' ? '#10b981' : '#f43f5e';
+  const activeColor = type === 'income' ? theme.positive : theme.negative;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.headerArea}>
-            <Text style={[styles.headerTitle, { color: theme.text }]}>Input Transaksi</Text>
-            <Text style={[styles.headerSub, { color: theme.accent }]}>Catat arus kas Anda secara presisi</Text>
+            <Text style={[styles.headerTitle, { color: theme.text }]}>Catat Transaksi</Text>
+            <Text style={[styles.headerSub, { color: theme.textSecondary }]}>Pantau setiap rupiah yang mengalir</Text>
           </View>
           
           <View style={[styles.typeSwitcher, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <TouchableOpacity 
-              style={[styles.typeButton, type === 'expense' && { backgroundColor: '#f43f5e' }]} 
+              activeOpacity={0.7}
+              style={[styles.typeButton, type === 'expense' && { backgroundColor: theme.negative }]} 
               onPress={() => handleTypeChange('expense')}
             >
-              <MinusCircle size={16} color={type === 'expense' ? '#fff' : '#f43f5e'} />
-              <Text style={[styles.typeText, { color: type === 'expense' ? '#fff' : theme.text }]}>Pengeluaran</Text>
+              <MinusCircle size={18} color={type === 'expense' ? '#fff' : theme.negative} />
+              <Text style={[styles.typeText, { color: type === 'expense' ? '#fff' : theme.text }]}>Keluar</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              style={[styles.typeButton, type === 'income' && { backgroundColor: '#10b981' }]} 
+              activeOpacity={0.7}
+              style={[styles.typeButton, type === 'income' && { backgroundColor: theme.positive }]} 
               onPress={() => handleTypeChange('income')}
             >
-              <PlusCircle size={16} color={type === 'income' ? '#fff' : '#10b981'} />
-              <Text style={[styles.typeText, { color: type === 'income' ? '#fff' : theme.text }]}>Pemasukan</Text>
+              <PlusCircle size={18} color={type === 'income' ? '#fff' : theme.positive} />
+              <Text style={[styles.typeText, { color: type === 'income' ? '#fff' : theme.text }]}>Masuk</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.formSection}>
             <View style={styles.inputGroup}>
                 <View style={styles.labelRow}>
-                    <Layout size={14} color={theme.accent} />
-                    <Text style={[styles.label, { color: theme.text }]}>Keterangan</Text>
+                    <Layout size={14} color={theme.textSecondary} />
+                    <Text style={[styles.label, { color: theme.textSecondary }]}>Deskripsi</Text>
                 </View>
                 <TextInput 
                   style={[styles.input, { color: theme.text, backgroundColor: theme.card, borderColor: theme.border }]} 
-                  placeholder="Contoh: Makan siang di kantor" 
-                  placeholderTextColor={theme.accent}
+                  placeholder="Misal: Kopi pagi" 
+                  placeholderTextColor={theme.textSecondary}
                   value={title}
                   onChangeText={setTitle}
                 />
@@ -108,13 +110,13 @@ const TransactionScreen = () => {
 
             <View style={styles.inputGroup}>
                 <View style={styles.labelRow}>
-                    <CreditCard size={14} color={theme.accent} />
-                    <Text style={[styles.label, { color: theme.text }]}>Nominal (Rp)</Text>
+                    <CreditCard size={14} color={theme.textSecondary} />
+                    <Text style={[styles.label, { color: theme.textSecondary }]}>Nominal (Rp)</Text>
                 </View>
                 <TextInput 
                   style={[styles.input, styles.amountInput, { color: activeColor, backgroundColor: theme.card, borderColor: theme.border }]} 
                   placeholder="0" 
-                  placeholderTextColor={theme.accent}
+                  placeholderTextColor={theme.textSecondary}
                   keyboardType="numeric"
                   value={displayAmount}
                   onChangeText={handleAmountChange}
@@ -123,8 +125,8 @@ const TransactionScreen = () => {
 
             <View style={styles.inputGroup}>
                 <View style={styles.labelRow}>
-                    <Tag size={14} color={theme.accent} />
-                    <Text style={[styles.label, { color: theme.text }]}>Kategori</Text>
+                    <Tag size={14} color={theme.textSecondary} />
+                    <Text style={[styles.label, { color: theme.textSecondary }]}>Kategori</Text>
                 </View>
                 <View style={styles.categoryGrid}>
                     {CATEGORIES[type].map(cat => (
@@ -133,7 +135,7 @@ const TransactionScreen = () => {
                             onPress={() => setCategory(cat)}
                             style={[
                                 styles.categoryTag, 
-                                { borderColor: theme.border },
+                                { borderColor: theme.border, backgroundColor: theme.card },
                                 category === cat && { backgroundColor: activeColor, borderColor: activeColor }
                             ]}
                         >
@@ -149,12 +151,12 @@ const TransactionScreen = () => {
           </View>
 
           <TouchableOpacity 
-            activeOpacity={0.8}
-            style={[styles.saveBtn, { backgroundColor: activeColor, shadowColor: activeColor }]} 
+            activeOpacity={0.9}
+            style={[styles.saveBtn, { backgroundColor: activeColor }]} 
             onPress={handleSave}
           >
             <Save color="#fff" size={20} />
-            <Text style={[styles.saveBtnText, { color: '#fff' }]}>Simpan Transaksi</Text>
+            <Text style={[styles.saveBtnText, { color: '#fff' }]}>Simpan Catatan</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -164,34 +166,35 @@ const TransactionScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  content: { padding: 25 },
-  headerArea: { marginBottom: 30 },
-  headerTitle: { fontSize: 30, fontWeight: '900', letterSpacing: -0.5 },
-  headerSub: { fontSize: 13, marginTop: 4, fontWeight: '500' },
-  typeSwitcher: { flexDirection: 'row', borderRadius: 20, padding: 6, marginBottom: 35, borderWidth: 1 },
-  typeButton: { flex: 1, paddingVertical: 14, alignItems: 'center', borderRadius: 16, flexDirection: 'row', justifyContent: 'center', gap: 8 },
-  typeText: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
-  formSection: { gap: 25 },
+  content: { paddingHorizontal: 25, paddingVertical: 20 },
+  headerArea: { marginBottom: 35 },
+  headerTitle: { fontSize: 30, fontWeight: '900', letterSpacing: -1 },
+  headerSub: { fontSize: 14, marginTop: 4, fontWeight: '600' },
+  typeSwitcher: { flexDirection: 'row', borderRadius: 24, padding: 6, marginBottom: 40, borderWidth: 1.5 },
+  typeButton: { flex: 1, paddingVertical: 16, alignItems: 'center', borderRadius: 18, flexDirection: 'row', justifyContent: 'center', gap: 10 },
+  typeText: { fontSize: 13, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
+  formSection: { gap: 30 },
   inputGroup: { },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12, marginLeft: 5 },
-  label: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, opacity: 0.6 },
-  input: { borderWidth: 1, borderRadius: 18, padding: 18, fontSize: 16, fontWeight: '600' },
-  amountInput: { fontSize: 24, fontWeight: '900', paddingVertical: 22 },
+  label: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },
+  input: { borderWidth: 1.5, borderRadius: 20, padding: 20, fontSize: 16, fontWeight: '600' },
+  amountInput: { fontSize: 28, fontWeight: '900', paddingVertical: 25 },
   categoryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  categoryTag: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, borderWidth: 1 },
+  categoryTag: { paddingHorizontal: 18, paddingVertical: 12, borderRadius: 14, borderWidth: 1.5 },
   categoryTagText: { fontSize: 13, fontWeight: '700' },
   saveBtn: { 
     flexDirection: 'row', 
     padding: 22, 
-    borderRadius: 20, 
+    borderRadius: 22, 
     alignItems: 'center', 
     justifyContent: 'center', 
     gap: 12, 
-    marginTop: 40,
+    marginTop: 50,
+    elevation: 8,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 8
+    shadowOpacity: 0.1,
+    shadowRadius: 15
   },
   saveBtnText: { fontSize: 16, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' },
 });

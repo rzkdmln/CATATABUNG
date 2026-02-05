@@ -1,38 +1,40 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { ArrowUpRight, ArrowDownLeft, Tag } from 'lucide-react-native';
+import { ArrowUpRight, ArrowDownLeft, Tag, Calendar as CalendarIcon } from 'lucide-react-native';
 import { useTheme } from '../context/ThemeContext';
 import { formatRupiah } from '../utils/format';
 
 const TransactionCard = ({ item }) => {
   const { theme } = useTheme();
   const isIncome = item.type === 'income';
-  const EMERALD = '#10b981';
-  const ROSE = '#f43f5e';
   
   return (
     <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-      <View style={[styles.iconContainer, { backgroundColor: theme.background }]}>
+      <View style={[styles.iconContainer, { backgroundColor: isIncome ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)' }]}>
         {isIncome ? (
-          <ArrowUpRight size={18} color={EMERALD} />
+          <ArrowUpRight size={20} color={theme.positive} strokeWidth={2.5} />
         ) : (
-          <ArrowDownLeft size={18} color={ROSE} />
+          <ArrowDownLeft size={20} color={theme.negative} strokeWidth={2.5} />
         )}
       </View>
       <View style={styles.details}>
         <Text style={[styles.title, { color: theme.text }]} numberOfLines={1}>{item.title}</Text>
         <View style={styles.metaRow}>
-            <View style={[styles.tag, { backgroundColor: theme.background, borderColor: theme.border }]}>
-                <Tag size={10} color={theme.accent} />
-                <Text style={[styles.category, { color: theme.accent }]}>{item.category || 'Umum'}</Text>
+            <View style={styles.metaItem}>
+                <Tag size={12} color={theme.textSecondary} />
+                <Text style={[styles.category, { color: theme.textSecondary }]}>{item.category || 'Umum'}</Text>
             </View>
-            <Text style={[styles.date, { color: theme.accent }]}>
-                {item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '-'}
-            </Text>
+            <View style={[styles.dot, { backgroundColor: theme.border }]} />
+            <View style={styles.metaItem}>
+                <CalendarIcon size={12} color={theme.textSecondary} />
+                <Text style={[styles.date, { color: theme.textSecondary }]}>
+                    {item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '-'}
+                </Text>
+            </View>
         </View>
       </View>
       <View style={styles.amountCol}>
-        <Text style={[styles.amount, { color: isIncome ? EMERALD : ROSE }]}>
+        <Text style={[styles.amount, { color: isIncome ? theme.positive : theme.negative }]}>
             {isIncome ? '+' : '-'} {formatRupiah(item.amount).replace('Rp ', '')}
         </Text>
       </View>
@@ -44,59 +46,62 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 20,
-    marginBottom: 12,
-    borderWidth: 1,
+    padding: 18,
+    borderRadius: 24,
+    marginBottom: 14,
+    borderWidth: 1.5,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 5
   },
   iconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.05)'
   },
   details: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: 18,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+    marginBottom: 4
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
-    gap: 10
+    gap: 8
   },
-  title: {
-    fontSize: 15,
-    fontWeight: '800',
-    letterSpacing: -0.3
-  },
-  tag: {
+  metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    borderWidth: 0.5
+    gap: 4
+  },
+  dot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
   },
   category: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
-    textTransform: 'uppercase'
   },
   date: {
-    fontSize: 10,
-    fontWeight: '600',
-    opacity: 0.6
+    fontSize: 12,
+    fontWeight: '700',
   },
   amountCol: {
     alignItems: 'flex-end',
+    marginLeft: 10
   },
   amount: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '900',
   },
 });

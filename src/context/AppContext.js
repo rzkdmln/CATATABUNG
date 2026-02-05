@@ -20,11 +20,11 @@ export const AppProvider = ({ children }) => {
         const { data: { session: existingSession } } = await supabase.auth.getSession();
         
         if (!existingSession) {
-          // Sign in anonymously if no session exists to satisfy RLS
+          // Sign in anonymously as fallback if anon sign-in is enabled in Supabase
           const { data, error } = await supabase.auth.signInAnonymously();
           if (error) {
-            console.error("Anonymous Sign-in Error:", error);
-            // Even if auth fails, we should stop the loading state to avoid a blank screen
+            console.warn("Anonymous Sign-in skipped (might be disabled):", error.message);
+            // Don't block loading if it fails, just wait for potential manual login
             setLoading(false);
           } else {
             setSession(data.session);
@@ -42,6 +42,14 @@ export const AppProvider = ({ children }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session?.user) {
+        // Update user state from auth session
+        setUser({
+          name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
+          profileImage: session.user.user_metadata?.avatar_url || null,
+          email: session.user.email
+        });
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -66,14 +74,49 @@ export const AppProvider = ({ children }) => {
       
       if (remoteTransactions) setTransactions(remoteTransactions);
       if (remoteGoals) setGoals(remoteGoals);
-      if (savedUser) setUser(savedUser);
+      
+      // If we have a session user, prioritize it over local storage
+      if (session?.user) {
+        setUser({
+          name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
+          profileImage: session.user.user_metadata?.avatar_url || null,
+          email: session.user.email
+        });
+      } else if (savedUser) {
+        setUser(savedUser);
+      }
+
       if (savedOnboarding) setIsOnboarded(savedOnboarding);
       
     } catch (e) {
       console.error("Load initial data error:", e);
     } finally {
+      // Small timeout to prevent UI flickering
+      setTimeout(() => setLoading(false), 500);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin, // For Web/PWA
+        }
+      });
+      if (error) throw error;
+    } catch (err) {
+      console.error("Google Login Error:", err.message);
       setLoading(false);
     }
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setUser({ name: '', profileImage: null });
+    setIsOnboarded(false);
+    await saveData('onboarding_status', false);
   };
 
   const completeOnboarding = async (name) => {
@@ -169,7 +212,10 @@ export const AppProvider = ({ children }) => {
       completeOnboarding,
       updateUser,
       setSecurity,
-      unlockApp
+      unlockApp,
+      signInWithGoogle,
+      logout,
+      refreshData: loadInitialData
     }}>
       {children}
     </AppContext.Provider>
