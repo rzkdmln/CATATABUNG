@@ -15,26 +15,41 @@ export const AppProvider = ({ children }) => {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    // Listen for Auth changes
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const handleInitialAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // Sign in anonymously if no session exists to satisfy RLS
+        const { data, error } = await supabase.auth.signInAnonymously();
+        if (error) console.error("Anonymous Sign-in Error:", error);
+        else setSession(data.session);
+      } else {
+        setSession(session);
+      }
+    };
+
+    handleInitialAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (session) loadInitialData();
     });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    loadInitialData();
+    return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (session) {
+      loadInitialData();
+    }
+  }, [session]);
 
   const loadInitialData = async () => {
     try {
       setLoading(true);
-      await db.initDB();
-      
-      const remoteTransactions = await db.db_getTransactions();
-      const remoteGoals = await db.db_getGoals();
+      const [remoteTransactions, remoteGoals] = await Promise.all([
+        db.db_getTransactions(),
+        db.db_getGoals()
+      ]);
       
       const savedUser = await getData('user_profile');
       const savedOnboarding = await getData('onboarding_status');
@@ -45,7 +60,7 @@ export const AppProvider = ({ children }) => {
       if (savedOnboarding) setIsOnboarded(savedOnboarding);
       
     } catch (e) {
-      console.error("Load data error", e);
+      console.error("Load initial data error:", e);
     } finally {
       setLoading(false);
     }

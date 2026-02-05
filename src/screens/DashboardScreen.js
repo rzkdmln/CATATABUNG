@@ -7,6 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 import TransactionCard from '../components/TransactionCard';
 import GoalProgress from '../components/GoalProgress';
 import { TrendingUp, TrendingDown, Wallet, ArrowRight, Bell } from 'lucide-react-native';
+import { formatRupiah } from '../utils/format';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -15,9 +16,9 @@ const DashboardScreen = ({ navigation }) => {
   const { theme, isDark } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
 
-  const formatIDR = (val) => {
-    return 'Rp ' + val.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
+  // Constants for professional colors
+  const EMERALD = '#10b981';
+  const ROSE = '#f43f5e';
 
   // 1. Data untuk Pie Chart (Aliran Dana per Kategori)
   const pieData = useMemo(() => {
@@ -69,9 +70,15 @@ const DashboardScreen = ({ navigation }) => {
 
     return {
       labels: ["Masuk", "Keluar"],
-      datasets: [{ data: [inc / 1000, exp / 1000] }]
+      datasets: [{ 
+        data: [inc / 1000, exp / 1000],
+        colors: [
+            (opacity = 1) => EMERALD,
+            (opacity = 1) => ROSE
+        ]
+      }]
     };
-  }, [transactions]);
+  }, [transactions, EMERALD, ROSE]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -114,20 +121,20 @@ const DashboardScreen = ({ navigation }) => {
         </View>
 
         {/* Total Balance Card */}
-        <View style={[styles.balanceCard, { backgroundColor: theme.text }]}>
+        <View style={[styles.balanceCard, { backgroundColor: theme.primary || theme.text }]}>
           <View style={styles.balanceHeader}>
-            <Wallet color={theme.background} size={20} />
-            <Text style={[styles.balanceLabel, { color: theme.background }]}>Total Kekayaan Bersih</Text>
+            <Wallet color="#fff" size={20} />
+            <Text style={[styles.balanceLabel, { color: '#fff' }]}>Total Kekayaan Bersih</Text>
           </View>
-          <Text style={[styles.balanceValue, { color: theme.background }]}>{formatIDR(getBalance())}</Text>
+          <Text style={[styles.balanceValue, { color: '#fff' }]}>{formatRupiah(getBalance())}</Text>
           <View style={styles.balanceFooter}>
             <View style={styles.stat}>
-               <TrendingUp size={14} color={theme.positive} />
-               <Text style={[styles.statText, { color: theme.background }]}>Laporan aman hari ini</Text>
+               <TrendingUp size={14} color={EMERALD} />
+               <Text style={[styles.statText, { color: '#fff' }]}>Laporan aman hari ini</Text>
             </View>
             <TouchableOpacity style={styles.detailsBtn}>
-               <Text style={{ color: theme.background, fontWeight: '700', fontSize: 12 }}>Rincian</Text>
-               <ArrowRight size={14} color={theme.background} />
+               <Text style={{ color: '#fff', fontWeight: '700', fontSize: 12 }}>Rincian</Text>
+               <ArrowRight size={14} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>

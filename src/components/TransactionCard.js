@@ -2,18 +2,21 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ArrowUpRight, ArrowDownLeft, Tag } from 'lucide-react-native';
 import { useTheme } from '../context/ThemeContext';
+import { formatRupiah } from '../utils/format';
 
 const TransactionCard = ({ item }) => {
   const { theme } = useTheme();
   const isIncome = item.type === 'income';
+  const EMERALD = '#10b981';
+  const ROSE = '#f43f5e';
   
   return (
     <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
       <View style={[styles.iconContainer, { backgroundColor: theme.background }]}>
         {isIncome ? (
-          <ArrowUpRight size={18} color={theme.positive} />
+          <ArrowUpRight size={18} color={EMERALD} />
         ) : (
-          <ArrowDownLeft size={18} color={theme.negative} />
+          <ArrowDownLeft size={18} color={ROSE} />
         )}
       </View>
       <View style={styles.details}>
@@ -23,12 +26,14 @@ const TransactionCard = ({ item }) => {
                 <Tag size={10} color={theme.accent} />
                 <Text style={[styles.category, { color: theme.accent }]}>{item.category || 'Umum'}</Text>
             </View>
-            <Text style={[styles.date, { color: theme.accent }]}>{item.date}</Text>
+            <Text style={[styles.date, { color: theme.accent }]}>
+                {item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '-'}
+            </Text>
         </View>
       </View>
       <View style={styles.amountCol}>
-        <Text style={[styles.amount, { color: isIncome ? theme.positive : theme.negative }]}>
-            {isIncome ? '+' : '-'} {item.amount.toLocaleString()}
+        <Text style={[styles.amount, { color: isIncome ? EMERALD : ROSE }]}>
+            {isIncome ? '+' : '-'} {formatRupiah(item.amount).replace('Rp ', '')}
         </Text>
       </View>
     </View>

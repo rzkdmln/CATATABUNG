@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { Save, MinusCircle, PlusCircle, Tag, CreditCard, Layout } from 'lucide-react-native';
+import { formatNumber, cleanNumber } from '../utils/format';
 
 const CATEGORIES = {
   expense: ['Makanan', 'Transport', 'Belanja', 'Tagihan', 'Hiburan', 'Kesehatan', 'Lainnya'],
@@ -14,7 +15,7 @@ const TransactionScreen = () => {
   const { addTransaction } = useAppContext();
   const { theme } = useTheme();
   const [title, setTitle] = useState('');
-  const [amount, setAmount] = useState('');
+  const [displayAmount, setDisplayAmount] = useState('');
   const [type, setType] = useState('expense');
   const [category, setCategory] = useState(CATEGORIES.expense[0]);
 
@@ -23,31 +24,46 @@ const TransactionScreen = () => {
     setCategory(CATEGORIES[newType][0]);
   };
 
-  const handleSave = () => {
-    if (!title || !amount) {
+  const handleAmountChange = (text) => {
+    const cleaned = cleanNumber(text);
+    if (cleaned === '') {
+      setDisplayAmount('');
+      return;
+    }
+    setDisplayAmount(formatNumber(cleaned));
+  };
+
+  const handleSave = async () => {
+    if (!title || !displayAmount) {
       Alert.alert('Data Belum Lengkap', 'Judul dan nominal harus diisi.');
       return;
     }
 
-    const numAmount = parseFloat(amount.replace(/[^0-9.]/g, ''));
+    const numAmount = parseFloat(cleanNumber(displayAmount));
     if (isNaN(numAmount) || numAmount <= 0) {
       Alert.alert('Nominal Tidak Valid', 'Harap masukkan angka yang benar.');
       return;
     }
 
-    const newTransaction = {
-      title,
-      amount: numAmount,
-      type,
-      category,
-      date: new Date().toISOString(),
-    };
+    try {
+      const newTransaction = {
+        title,
+        amount: numAmount,
+        type,
+        category,
+        date: new Date().toISOString(),
+      };
 
-    addTransaction(newTransaction);
-    setTitle('');
-    setAmount('');
-    Alert.alert('Berhasil', 'Transaksi telah dicatat ke dalam database.');
+      await addTransaction(newTransaction);
+      setTitle('');
+      setDisplayAmount('');
+      Alert.alert('Berhasil', 'Transaksi telah dicatat secara permanen.');
+    } catch (err) {
+      Alert.alert('Gagal', 'Terjadi kesalahan saat menyimpan data.');
+    }
   };
+
+  const activeColor = type === 'income' ? '#10b981' : '#f43f5e';
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
@@ -60,18 +76,18 @@ const TransactionScreen = () => {
           
           <View style={[styles.typeSwitcher, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <TouchableOpacity 
-              style={[styles.typeButton, type === 'expense' && { backgroundColor: theme.text }]} 
+              style={[styles.typeButton, type === 'expense' && { backgroundColor: '#f43f5e' }]} 
               onPress={() => handleTypeChange('expense')}
             >
-              <MinusCircle size={16} color={type === 'expense' ? theme.background : theme.negative} />
-              <Text style={[styles.typeText, { color: type === 'expense' ? theme.background : theme.text }]}>Pengeluaran</Text>
+              <MinusCircle size={16} color={type === 'expense' ? '#fff' : '#f43f5e'} />
+              <Text style={[styles.typeText, { color: type === 'expense' ? '#fff' : theme.text }]}>Pengeluaran</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              style={[styles.typeButton, type === 'income' && { backgroundColor: theme.text }]} 
+              style={[styles.typeButton, type === 'income' && { backgroundColor: '#10b981' }]} 
               onPress={() => handleTypeChange('income')}
             >
-              <PlusCircle size={16} color={type === 'income' ? theme.background : theme.positive} />
-              <Text style={[styles.typeText, { color: type === 'income' ? theme.background : theme.text }]}>Pemasukan</Text>
+              <PlusCircle size={16} color={type === 'income' ? '#fff' : '#10b981'} />
+              <Text style={[styles.typeText, { color: type === 'income' ? '#fff' : theme.text }]}>Pemasukan</Text>
             </TouchableOpacity>
           </View>
 
@@ -96,12 +112,12 @@ const TransactionScreen = () => {
                     <Text style={[styles.label, { color: theme.text }]}>Nominal (Rp)</Text>
                 </View>
                 <TextInput 
-                  style={[styles.input, styles.amountInput, { color: theme.text, backgroundColor: theme.card, borderColor: theme.border }]} 
+                  style={[styles.input, styles.amountInput, { color: activeColor, backgroundColor: theme.card, borderColor: theme.border }]} 
                   placeholder="0" 
                   placeholderTextColor={theme.accent}
                   keyboardType="numeric"
-                  value={amount}
-                  onChangeText={setAmount}
+                  value={displayAmount}
+                  onChangeText={handleAmountChange}
                 />
             </View>
 
@@ -118,13 +134,13 @@ const TransactionScreen = () => {
                             style={[
                                 styles.categoryTag, 
                                 { borderColor: theme.border },
-                                category === cat && { backgroundColor: theme.text, borderColor: theme.text }
+                                category === cat && { backgroundColor: activeColor, borderColor: activeColor }
                             ]}
                         >
                             <Text style={[
                                 styles.categoryTagText, 
                                 { color: theme.text },
-                                category === cat && { color: theme.background }
+                                category === cat && { color: '#fff' }
                             ]}>{cat}</Text>
                         </TouchableOpacity>
                     ))}
@@ -134,11 +150,11 @@ const TransactionScreen = () => {
 
           <TouchableOpacity 
             activeOpacity={0.8}
-            style={[styles.saveBtn, { backgroundColor: theme.text, shadowColor: theme.text }]} 
+            style={[styles.saveBtn, { backgroundColor: activeColor, shadowColor: activeColor }]} 
             onPress={handleSave}
           >
-            <Save color={theme.background} size={20} />
-            <Text style={[styles.saveBtnText, { color: theme.background }]}>Simpan Transaksi</Text>
+            <Save color="#fff" size={20} />
+            <Text style={[styles.saveBtnText, { color: '#fff' }]}>Simpan Transaksi</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
