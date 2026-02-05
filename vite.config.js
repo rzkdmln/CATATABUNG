@@ -9,6 +9,18 @@ export default defineConfig({
       'react-native': 'react-native-web',
     },
   },
+  esbuild: {
+    loader: 'jsx',
+    include: /src\/.*\.js$|App\.js$|index\.js$/,
+    exclude: [],
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      loader: {
+        '.js': 'jsx',
+      },
+    },
+  },
   define: {
     global: 'window',
   },
