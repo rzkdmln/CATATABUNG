@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "CATATABUNG",
+    "name": "CATATABUNG Pro",
     "slug": "CATATABUNG",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -38,11 +38,15 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
+      "output": "static",
       "name": "CATATABUNG Pro",
       "shortName": "CATATABUNG",
+      "description": "Aplikasi pencatat keuangan pribadi dan target tabungan.",
+      "lang": "id",
       "display": "standalone",
       "themeColor": "#000000",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#000000",
+      "preferRelatedApplications": false
     },
     "plugins": [
       [
