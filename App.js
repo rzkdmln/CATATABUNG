@@ -2,7 +2,6 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StatusBar } from 'expo-status-bar';
 import { LayoutDashboard, Receipt, Target, Calendar, User, CircleHelp } from 'lucide-react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -49,16 +48,12 @@ const RootNavigator = () => {
   // 2. Check Security Lock
   if (isLocked) {
     return (
-      <>
-        <StatusBar style={isDark ? "light" : "dark"} />
-        <SecurityScreen />
-      </>
+      <SecurityScreen />
     );
   }
 
   return (
     <NavigationContainer>
-      <StatusBar style={isDark ? "light" : "dark"} />
       <Tab.Navigator
         screenOptions={{
           headerShown: false,

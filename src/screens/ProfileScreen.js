@@ -16,7 +16,33 @@ const ProfileScreen = () => {
   const [newName, setNewName] = useState(user?.name || '');
   const [securityEnabled, setSecurityEnabled] = useState(false);
 
-  // ... (pickImage and handleSaveName functions stay same)
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Izin Diperlukan', 'Kami memerlukan izin galeri untuk mengganti foto profil.');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      await updateUser({ profileImage: result.assets[0].uri });
+    }
+  };
+
+  const handleSaveName = async () => {
+    if (newName.trim()) {
+      await updateUser({ name: newName });
+      setEditingName(false);
+    } else {
+      Alert.alert('Error', 'Nama tidak boleh kosong');
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
