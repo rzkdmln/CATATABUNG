@@ -3,31 +3,15 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [
-    react({
-      // Memaksa plugin react untuk memproses file .js sebagai JSX
-      jsxRuntime: 'automatic',
-      include: /\.(js|jsx|ts|tsx)$/,
-    })
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       'react-native': 'react-native-web',
+      '@react-native-community/datetimepicker': path.resolve(__dirname, 'src/components/WebDateTimePicker.jsx'),
+      'react-native-chart-kit': path.resolve(__dirname, 'src/components/WebChartMock.jsx'),
+      'react-native-calendars': path.resolve(__dirname, 'src/components/WebCalendarMock.jsx'),
     },
-    extensions: ['.web.js', '.js', '.jsx', '.ts', '.tsx']
-  },
-  esbuild: {
-    // Memaksa esbuild (untuk dev) menggunakan loader JSX untuk file .js
-    loader: 'jsx',
-    include: /src\/.*\.js$|App\.js$|index\.js$/,
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      loader: {
-        '.js': 'jsx',
-      },
-      resolveExtensions: ['.web.js', '.js', '.jsx', '.ts', '.tsx']
-    },
+    extensions: ['.web.jsx', '.web.js', '.jsx', '.js', '.ts', '.tsx']
   },
   define: {
     global: 'window',
